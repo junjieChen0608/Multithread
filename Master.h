@@ -39,13 +39,11 @@ private:
             master_->wakeupCondition.wait(lock);
           }
           jobAllocated = master_->taskQueue.dequeue(func);
-          if (jobAllocated) {
-            std::cout << "slave " << slaveId_ << " is busy\n";
-          }
         }
 
         if (jobAllocated) {
-          // TODO need to modify available slave here
+          // TODO need to mark this slave as busy
+          std::cout << "slave " << slaveId_ << " is busy\n";
           func();
           // TODO need to modify available slave here
           std::cout << "slave " << slaveId_ << " is available\n";
