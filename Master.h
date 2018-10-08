@@ -15,18 +15,22 @@ class Master {
 private:
   class Slave {
   private:
-    int workerId_;
+    int slaveId_;
     Master* master_;
 
   public:
     Slave(Master* master, const int id)
-      : master_(master), workerId_(id) {}
+      : master_(master), slaveId_(id) {
+      std::cout << "slave CTOR\n";
+    }
 
-    ~Slave() {}
+    ~Slave() {
+      std::cout << "slave DTOR\n";
+    }
 
     void operator()() {
       std::function<void()> func;
-      bool jobAllocated;
+      bool jobAllocated = false;
 
       while (!master_->needShutdown) {
         {
@@ -35,12 +39,16 @@ private:
             master_->wakeupCondition.wait(lock);
           }
           jobAllocated = master_->taskQueue.dequeue(func);
+          if (jobAllocated) {
+            std::cout << "slave " << slaveId_ << " is busy\n";
+          }
         }
 
         if (jobAllocated) {
           // TODO need to modify available slave here
           func();
           // TODO need to modify available slave here
+          std::cout << "slave " << slaveId_ << " is available\n";
         }
       }
 
@@ -57,11 +65,13 @@ public:
   Master(const int nSlaves)
     : slavePool(std::vector<std::thread>(nSlaves)), needShutdown(false) {
       initSlavePool();
+      std::cout << "master CTOR\n";
     }
 
   ~Master() {
     // destroy all slaves here
     shutdown();
+    std::cout << "master DTOR\n";
   }
 
   // disable copy ctor
@@ -73,6 +83,7 @@ public:
   Master& operator=(Master&& another) = delete;
 
   void initSlavePool() {
+    std::cout << "init " << slavePool.size() << " slaves\n";
     for (int i = 0; i < slavePool.size(); ++i) {
       slavePool[i] = std::thread(Slave(this, i));
     }
