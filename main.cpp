@@ -1,27 +1,21 @@
+/*
+ * The client comes in and submit Tasks to the Master.
+ * Master is going to spawn N slaves, initialize all necessary flags and variables, then all go to sleep.
+ * Master maintains a queue of Tasks, and a Slave pool internally.
+ * Master is wake up by incoming Tasks via condition_variable, then master will allocate available Slave to handle Tasks
+ * Once a Slave finished its Task, it will notify the Master and return to Slave pool
+ * Master will go back to sleep once the Task queue is empty
+ */
+
 #include <iostream>
+#include <queue>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 
-inline void myName(const std::string& name) {
-  std::cout << "My name is " << name << "\n";
-}
-
-inline void myAge(const int& age) {
-  std::cout << "I am " << age << " years old\n";
-}
-
-inline void selfIntro(const std::string& name, const int& age) {
-  myName(name);
-  myAge(age);
-}
+#include "TaskQueue.h"
 
 int main() {
-  std::string name = "JJC";
-  int age = 27;
-  std::thread selfIntroductrionThread(selfIntro, name, age);
 
-  if (selfIntroductrionThread.joinable()) {
-    selfIntroductrionThread.join();
-  }
   return 0;
 }
