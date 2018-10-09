@@ -21,11 +21,11 @@ private:
   public:
     Slave(Master* master, const int id)
       : master_(master), slaveId_(id) {
-      std::cout << "slave CTOR\n";
+      std::cout << "slave " << slaveId_ <<  " CTOR\n";
     }
 
     ~Slave() {
-      std::cout << "slave DTOR\n";
+      std::cout << "slave " << slaveId_ <<  " DTOR\n";
     }
 
     void operator()() {
@@ -50,7 +50,7 @@ private:
           std::cout << "slave " << slaveId_ << " is available\n";
         }
       }
-
+      std::cout << "Slave " << slaveId_ << " wake up to be shutdown\n";
     }
   };
 

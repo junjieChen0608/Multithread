@@ -64,30 +64,34 @@ void swap_ptr(int* a, int* b) {
 int main() {
   Master master(4);
 
-  for (int i = 1; i < 3; ++i) {
-    for (int j = 1; j < 3; ++j) {
+  for (int i = 1; i < 5; ++i) {
+    for (int j = 1; j < 5; ++j) {
       master.submit(multiply, i, j);
     }
   }
 
   int outputRef;
   auto future1 = master.submit(multiply_output, std::ref(outputRef), 1, 999);
-  future1.get();
-  std::cout << "Last operation result is " << outputRef << "\n";
 
   auto future2 = master.submit(multiply_return, 20, 30);
-  int res = future2.get();
-  std::cout << "Last operation result is " << res << "\n";
 
   int a = 10;
   int b = 100;
   auto future3 = master.submit(swap, std::ref(a), std::ref(b));
-  future3.get();
-  std::cout << "after swap a: " << a << ", b: " << b << "\n";
 
   int c = 999;
   int d = 0;
   auto future4 = master.submit(swap_ptr, &c, &d);
+
+  future1.get();
+  std::cout << "Last operation result is " << outputRef << "\n";
+
+  int res = future2.get();
+  std::cout << "Last operation result is " << res << "\n";
+
+  future3.get();
+  std::cout << "after swap a: " << a << ", b: " << b << "\n";
+
   future4.get();
   std::cout << "after swap c: " << c << ", d: " << d << "\n";
 
