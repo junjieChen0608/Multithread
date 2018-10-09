@@ -23,27 +23,27 @@ std::uniform_int_distribution<int> dist(-1000, 1000);
 auto rnd = std::bind(dist, mt);
 
 
-void simulate_hard_computation() {
+void simulateHardComputation() {
   std::this_thread::sleep_for(std::chrono::milliseconds(1000 + rnd()));
 }
 
 // Simple function that adds multiplies two numbers and prints the result
 void multiply(const int a, const int b) {
-  simulate_hard_computation();
+  simulateHardComputation();
   const int res = a * b;
   std::cout << a << " * " << b << " = " << res << std::endl;
 }
 
 // Same as before but now we have an output parameter
-void multiply_output(int & out, const int a, const int b) {
-  simulate_hard_computation();
+void multiplyOutput(int &out, const int a, const int b) {
+  simulateHardComputation();
   out = a * b;
   std::cout << a << " * " << b << " = " << out << std::endl;
 }
 
 // Same as before but now we have an output parameter
-int multiply_return(const int a, const int b) {
-  simulate_hard_computation();
+int multiplyReturn(const int a, const int b) {
+  simulateHardComputation();
   const int res = a * b;
   std::cout << a << " * " << b << " = " << res << std::endl;
   return res;
@@ -55,7 +55,7 @@ void swap(int& a, int& b) {
   b = c;
 }
 
-void swap_ptr(int* a, int* b) {
+void swapPtr(int *a, int *b) {
   int c = *a;
   *a = *b;
   *b = c;
@@ -64,16 +64,16 @@ void swap_ptr(int* a, int* b) {
 int main() {
   Master master(4);
 
-  for (int i = 1; i < 5; ++i) {
-    for (int j = 1; j < 5; ++j) {
+  for (int i = 1; i < 3; ++i) {
+    for (int j = 1; j < 3; ++j) {
       master.submit(multiply, i, j);
     }
   }
 
   int outputRef;
-  auto future1 = master.submit(multiply_output, std::ref(outputRef), 1, 999);
+  auto future1 = master.submit(multiplyOutput, std::ref(outputRef), 1, 999);
 
-  auto future2 = master.submit(multiply_return, 20, 30);
+  auto future2 = master.submit(multiplyReturn, 20, 30);
 
   int a = 10;
   int b = 100;
@@ -81,7 +81,7 @@ int main() {
 
   int c = 999;
   int d = 0;
-  auto future4 = master.submit(swap_ptr, &c, &d);
+  auto future4 = master.submit(swapPtr, &c, &d);
 
   future1.get();
   std::cout << "Last operation result is " << outputRef << "\n";

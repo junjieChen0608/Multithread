@@ -38,15 +38,14 @@ private:
           if (master_->taskQueue.empty()) {
             std::cout << "slave " << slaveId_ << " is sleeping...\n";
             master_->wakeupCondition.wait(lock);
+            std::cout << "slave " << slaveId_ << " waked up...\n";
           }
           jobAllocated = master_->taskQueue.dequeue(func);
         }
 
         if (jobAllocated) {
-          // TODO need to mark this slave as busy
           std::cout << "slave " << slaveId_ << " is busy\n";
           func();
-          // TODO need to modify available slave here
           std::cout << "slave " << slaveId_ << " is available\n";
         }
       }
