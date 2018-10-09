@@ -3,8 +3,9 @@
  * Master is going to spawn N slaves, initialize all necessary flags and variables, then all go to sleep.
  * Master maintains a queue of Tasks, and a Slave pool internally.
  * Master is wake up by incoming Tasks via condition_variable, then master will allocate available Slave to handle Tasks
- * Once a Slave finished its Task, it will notify the Master and return to Slave pool
- * Master will go back to sleep once the Task queue is empty
+ * Once a Slave finished its Task, it will check if there is any work to be done, if YES, do more work, ELSE Slave sleep
+ *
+ * Master will destroy all Slaves when it is out of scope, or user explicitly call shutdown() function
  */
 
 #include <iostream>
@@ -23,7 +24,7 @@ auto rnd = std::bind(dist, mt);
 
 
 void simulate_hard_computation() {
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000 + rnd()));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000 + rnd()));
 }
 
 // Simple function that adds multiplies two numbers and prints the result
@@ -48,6 +49,18 @@ int multiply_return(const int a, const int b) {
   return res;
 }
 
+void swap(int& a, int& b) {
+  int c = a;
+  a = b;
+  b = c;
+}
+
+void swap_ptr(int* a, int* b) {
+  int c = *a;
+  *a = *b;
+  *b = c;
+}
+
 int main() {
   Master master(4);
 
@@ -65,6 +78,18 @@ int main() {
   auto future2 = master.submit(multiply_return, 20, 30);
   int res = future2.get();
   std::cout << "Last operation result is " << res << "\n";
+
+  int a = 10;
+  int b = 100;
+  auto future3 = master.submit(swap, std::ref(a), std::ref(b));
+  future3.get();
+  std::cout << "after swap a: " << a << ", b: " << b << "\n";
+
+  int c = 999;
+  int d = 0;
+  auto future4 = master.submit(swap_ptr, &c, &d);
+  future4.get();
+  std::cout << "after swap c: " << c << ", d: " << d << "\n";
 
   return 0;
 }

@@ -36,6 +36,7 @@ private:
         {
           std::unique_lock<std::mutex> lock(master_->mutex);
           if (master_->taskQueue.empty()) {
+            std::cout << "slave " << slaveId_ << " is sleeping...\n";
             master_->wakeupCondition.wait(lock);
           }
           jobAllocated = master_->taskQueue.dequeue(func);
@@ -87,6 +88,7 @@ public:
     }
   }
 
+  // wait for all Slaves to join
   void shutdown() {
     needShutdown = true;
     wakeupCondition.notify_all();
