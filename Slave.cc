@@ -1,6 +1,6 @@
 #include "Slave.h"
 
-Slave::Slave(Master& master, const int id)
+Slave::Slave(Master& master, const int& id)
     : master_(master), slaveId_(id) {}
 
 Slave::~Slave() {}

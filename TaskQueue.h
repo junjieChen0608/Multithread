@@ -23,19 +23,19 @@ public:
     return internalQ.size();
   }
 
-  void enqueue(T& task) {
+  void enqueue(const T& task) {
     std::lock_guard<std::mutex> lock(internalMutex);
     internalQ.push(task);
   }
 
-  bool dequeue(T& task) {
+  bool dequeue(T& outputTask) {
     std::lock_guard<std::mutex> lock(internalMutex);
 
     if (internalQ.empty()) {
       return false;
     }
 
-    task = std::move(internalQ.front());
+    outputTask = std::move(internalQ.front());
     internalQ.pop();
 
     return true;

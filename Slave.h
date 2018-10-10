@@ -20,7 +20,7 @@ private:
   Master& master_;
 
 public:
-  Slave(Master& master, const int id);
+  Slave(Master& master, const int& id);
   ~Slave();
 
   void operator()();
