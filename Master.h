@@ -9,50 +9,13 @@
 #include <vector>
 #include <iostream>
 
+#include "Slave.h"
 #include "TaskQueue.h"
+
+class Slave;
 
 class Master {
 private:
-  class Slave {
-  private:
-    int slaveId_;
-    Master* master_;
-
-  public:
-    Slave(Master* master, const int id)
-      : master_(master), slaveId_(id) {
-      std::cout << "slave " << slaveId_ <<  " CTOR\n";
-    }
-
-    ~Slave() {
-      std::cout << "slave " << slaveId_ <<  " DTOR\n";
-    }
-
-    void operator()() {
-      std::function<void()> func;
-      bool jobAllocated = false;
-
-      while (!master_->needShutdown) {
-        {
-          std::unique_lock<std::mutex> lock(master_->mutex);
-          if (master_->taskQueue.empty()) {
-            std::cout << "slave " << slaveId_ << " is sleeping...\n";
-            master_->wakeupCondition.wait(lock);
-            std::cout << "slave " << slaveId_ << " waked up...\n";
-          }
-          jobAllocated = master_->taskQueue.dequeue(func);
-        }
-
-        if (jobAllocated) {
-          std::cout << "slave " << slaveId_ << " is busy\n";
-          func();
-          std::cout << "slave " << slaveId_ << " is available\n";
-        }
-      }
-      std::cout << "Slave " << slaveId_ << " wake up to be shutdown\n";
-    }
-  };
-
   bool needShutdown;
   TaskQueue<std::function<void()>> taskQueue;
   std::vector<std::thread> slavePool;
@@ -60,17 +23,8 @@ private:
   std::condition_variable wakeupCondition;
 
 public:
-  Master(const int nSlaves)
-    : slavePool(std::vector<std::thread>(nSlaves)), needShutdown(false) {
-      initSlavePool();
-      std::cout << "master CTOR\n";
-    }
-
-  ~Master() {
-    // destroy all slaves here
-    shutdown();
-    std::cout << "master DTOR\n";
-  }
+  Master(int nSlaves);
+  ~Master();
 
   // disable copy ctor
   Master(const Master& another) = delete;
@@ -80,24 +34,10 @@ public:
   Master& operator=(const Master& another) = delete;
   Master& operator=(Master&& another) = delete;
 
-  void initSlavePool() {
-    std::cout << "init " << slavePool.size() << " slaves\n";
-    for (int i = 0; i < slavePool.size(); ++i) {
-      slavePool[i] = std::thread(Slave(this, i));
-    }
-  }
+  void initSlavePool();
 
   // wait for all Slaves to join
-  void shutdown() {
-    needShutdown = true;
-    wakeupCondition.notify_all();
-
-    for (auto& slave : slavePool) {
-      if (slave.joinable()) {
-        slave.join();
-      }
-    }
-  }
+  void shutdown();
 
   template<typename F, typename... Args>
   auto submit(F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
@@ -121,6 +61,13 @@ public:
 
     // return future from promise
     return taskPtr->get_future();
-
   }
+
+  bool isNeedShutdown() const;
+
+  TaskQueue<std::function<void()>>& getTaskQueue();
+
+  std::mutex& getMutex();
+
+  std::condition_variable& getWakeupCondition();
 };

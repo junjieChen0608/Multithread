@@ -24,6 +24,7 @@ auto rnd = std::bind(dist, mt);
 
 
 void simulateHardComputation() {
+  std::cout << "thread " << std::this_thread::get_id() << " working\n";
   std::this_thread::sleep_for(std::chrono::milliseconds(1000 + rnd()));
 }
 
@@ -64,8 +65,8 @@ void swapPtr(int *a, int *b) {
 int main() {
   Master master(4);
 
-  for (int i = 1; i < 3; ++i) {
-    for (int j = 1; j < 3; ++j) {
+  for (int i = 3; i < 6; ++i) {
+    for (int j = 3; j < 6; ++j) {
       master.submit(multiply, i, j);
     }
   }
