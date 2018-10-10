@@ -14,22 +14,22 @@ public:
   ~TaskQueue() {}
 
   bool empty() {
-    std::unique_lock<std::mutex> lock(internalMutex);
+    std::lock_guard<std::mutex> lock(internalMutex);
     return internalQ.empty();
   }
 
   size_t size() {
-    std::unique_lock<std::mutex> lock(internalMutex);
+    std::lock_guard<std::mutex> lock(internalMutex);
     return internalQ.size();
   }
 
   void enqueue(T& task) {
-    std::unique_lock<std::mutex> lock(internalMutex);
+    std::lock_guard<std::mutex> lock(internalMutex);
     internalQ.push(task);
   }
 
   bool dequeue(T& task) {
-    std::unique_lock<std::mutex> lock(internalMutex);
+    std::lock_guard<std::mutex> lock(internalMutex);
 
     if (internalQ.empty()) {
       return false;
