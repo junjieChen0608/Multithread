@@ -30,7 +30,7 @@ public:
   Master(const Master& another) = delete;
   Master(Master&& another) = delete;
 
-  // disable assignment operator
+  // disable move assignment operator
   Master& operator=(const Master& another) = delete;
   Master& operator=(Master&& another) = delete;
 
@@ -63,7 +63,7 @@ public:
     return taskPtr->get_future();
   }
 
-  bool isNeedShutdown() const;
+  bool needToShutdown() const;
 
   TaskQueue<std::function<void()>>& getTaskQueue();
 

@@ -1,11 +1,17 @@
 /*
- * The client comes in and submit Tasks to the Master.
- * Master is going to spawn N slaves, initialize all necessary flags and variables, then all go to sleep.
- * Master maintains a queue of Tasks, and a Slave pool internally.
- * Master is wake up by incoming Tasks via condition_variable, then master will allocate available Slave to handle Tasks
- * Once a Slave finished its Task, it will check if there is any work to be done, if YES, do more work, ELSE Slave sleep
+ * The client comes in and submit functions to the Master.
  *
- * Master will destroy all Slaves when it is out of scope, or user explicitly call shutdown() function
+ * Master will spawn N slaves upon construction, initializing all necessary flags and variables
+ * then all Slaves go to sleep.
+ *
+ * Master maintains a queue of functions, and a Slave pool internally.
+ *
+ * Master is waked up by incoming functions via condition_variable
+ * then Master will allocate functions to available Slave
+ *
+ * Once a Slave finished its job, it will check if there is any work to be done, if YES, do more work, ELSE Slave sleep
+ *
+ * Master will destroy all Slaves when it is out of scope, or user can explicitly call shutdown() function
  */
 
 #include <iostream>

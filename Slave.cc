@@ -9,7 +9,7 @@ void Slave::operator()() {
   std::function<void()> task;
   bool jobAllocated = false;
 
-  while (!master_.isNeedShutdown()) {
+  while (!master_.needToShutdown()) {
     {
       std::unique_lock<std::mutex> lock(master_.getMutex());
       if (master_.getTaskQueue().empty()) {

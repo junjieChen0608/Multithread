@@ -31,7 +31,7 @@ void Master::shutdown() {
   }
 }
 
-bool Master::isNeedShutdown() const {
+bool Master::needToShutdown() const {
   return needShutdown;
 }
 
