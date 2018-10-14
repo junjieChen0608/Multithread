@@ -48,7 +48,7 @@ void multiplyOutput(int &out, const int a, const int b) {
   std::cout << a << " * " << b << " = " << out << std::endl;
 }
 
-// Same as before but now we have an output parameter
+// Same as before but now we have a return value
 int multiplyReturn(const int a, const int b) {
   simulateHardComputation();
   const int res = a * b;
@@ -56,23 +56,30 @@ int multiplyReturn(const int a, const int b) {
   return res;
 }
 
+// modify parameter reference
 void swap(int& a, int& b) {
   int c = a;
   a = b;
   b = c;
 }
 
+// modify parameter pointer
 void swapPtr(int *a, int *b) {
   int c = *a;
   *a = *b;
   *b = c;
 }
 
-int main() {
-  Master master(4);
+void constRefFunction(const std::string& name, const int& age) {
+  std::cout << name << " is " << age << " years old\n";
+}
 
-  for (int i = 3; i < 6; ++i) {
-    for (int j = 3; j < 6; ++j) {
+int main() {
+  constexpr int N_THREAD = 4;
+  Master master(N_THREAD);
+
+  for (int i = 1; i < 3; ++i) {
+    for (int j = 1; j < 3; ++j) {
       master.submit(multiply, i, j);
     }
   }
@@ -101,6 +108,11 @@ int main() {
 
   future4.get();
   std::cout << "after swap c: " << c << ", d: " << d << "\n";
+
+  std::string name = "John Doe";
+  int age = 99;
+  auto future5 = master.submit(constRefFunction, std::cref(name), std::cref(age));
+  future5.get();
 
   return 0;
 }
