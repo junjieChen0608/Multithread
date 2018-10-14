@@ -1,3 +1,6 @@
+#ifndef MULTITHREAD_SLAVE_H
+#define MULTITHREAD_SLAVE_H
+
 #pragma once
 
 #include <functional>
@@ -25,3 +28,5 @@ public:
 
   void operator()();
 };
+
+#endif //MULTITHREAD_SLAVE_H

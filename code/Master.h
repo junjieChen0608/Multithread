@@ -1,3 +1,6 @@
+#ifndef MULTITHREAD_MASTER_H
+#define MULTITHREAD_MASTER_H
+
 #pragma once
 
 #include <functional>
@@ -71,3 +74,6 @@ public:
 
   std::condition_variable& getWakeupCondition();
 };
+
+#endif //MULTITHREAD_MASTER_H
+
