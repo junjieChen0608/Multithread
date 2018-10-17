@@ -7,7 +7,7 @@ Slave::~Slave() {}
 
 void Slave::operator()() {
   std::function<void()> task;
-  bool job_allocated = false;
+  bool task_allocated = false;
 
   while (!master_.NeedToShutdown()) {
     {
@@ -15,10 +15,10 @@ void Slave::operator()() {
       if (master_.GetTaskQueue().empty()) {
         master_.GetWakeupCondition().wait(lock);
       }
-      job_allocated = master_.GetTaskQueue().dequeue(task);
+      task_allocated = master_.GetTaskQueue().dequeue(task);
     }
 
-    if (job_allocated) {
+    if (task_allocated) {
       task();
     }
   }

@@ -30,7 +30,6 @@ auto rnd = std::bind(dist, mt);
 
 
 void SimulateHardComputation() {
-  std::cout << "thread " << std::this_thread::get_id() << " working\n";
   std::this_thread::sleep_for(std::chrono::milliseconds(1000 + rnd()));
 }
 

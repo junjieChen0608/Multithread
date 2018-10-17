@@ -1,7 +1,7 @@
 #include "Master.h"
 
-Master::Master(int nSlaves)
-    : slave_pool_(std::vector<std::thread>(nSlaves)), need_shut_down_(false) {
+Master::Master(int n_slaves)
+    : slave_pool_(std::vector<std::thread>(n_slaves)), need_shut_down_(false) {
   InitSlavePool();
   std::cout << "master CTOR\n";
 }

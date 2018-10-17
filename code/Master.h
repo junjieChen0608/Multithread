@@ -26,7 +26,7 @@ private:
   std::condition_variable wakeup_condition_;
 
 public:
-  Master(int nSlaves);
+  Master(int n_slaves);
   ~Master();
 
   // disable copy ctor
