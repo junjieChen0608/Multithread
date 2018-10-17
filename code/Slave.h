@@ -19,7 +19,7 @@ class Master;
 
 class Slave {
 private:
-  int slaveId_;
+  int slave_id_;
   Master& master_;
 
 public:

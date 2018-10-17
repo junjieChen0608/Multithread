@@ -1,48 +1,48 @@
 #include "Master.h"
 
 Master::Master(int nSlaves)
-    : slavePool(std::vector<std::thread>(nSlaves)), needShutdown(false) {
-  initSlavePool();
+    : slave_pool_(std::vector<std::thread>(nSlaves)), need_shut_down_(false) {
+  InitSlavePool();
   std::cout << "master CTOR\n";
 }
 
 Master::~Master() {
   // destroy all slaves here
-  shutdown();
+  Shutdown();
   std::cout << "master DTOR\n";
 }
 
-void Master::initSlavePool() {
-  std::cout << "init " << slavePool.size() << " slaves\n";
-  for (int i = 0; i < slavePool.size(); ++i) {
-    slavePool[i] = std::thread(Slave(*this, i));
+void Master::InitSlavePool() {
+  std::cout << "init " << slave_pool_.size() << " slaves\n";
+  for (int i = 0; i < slave_pool_.size(); ++i) {
+    slave_pool_[i] = std::thread(Slave(*this, i));
   }
 }
 
 // wait for all Slaves to join
-void Master::shutdown() {
-  needShutdown = true;
-  wakeupCondition.notify_all();
+void Master::Shutdown() {
+  need_shut_down_ = true;
+  wakeup_condition_.notify_all();
 
-  for (auto& slave : slavePool) {
+  for (auto& slave : slave_pool_) {
     if (slave.joinable()) {
       slave.join();
     }
   }
 }
 
-bool Master::needToShutdown() const {
-  return needShutdown;
+bool Master::NeedToShutdown() const {
+  return need_shut_down_;
 }
 
-TaskQueue<std::function<void()>>& Master::getTaskQueue() {
-  return taskQueue;
+TaskQueue<std::function<void()>>& Master::GetTaskQueue() {
+  return task_queue_;
 }
 
-std::mutex& Master::getMutex() {
-  return mutex;
+std::mutex& Master::GetMutex() {
+  return mutex_;
 }
 
-std::condition_variable& Master::getWakeupCondition() {
-  return wakeupCondition;
+std::condition_variable& Master::GetWakeupCondition() {
+  return wakeup_condition_;
 }

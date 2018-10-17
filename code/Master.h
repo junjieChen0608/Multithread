@@ -19,11 +19,11 @@ class Slave;
 
 class Master {
 private:
-  bool needShutdown;
-  TaskQueue<std::function<void()>> taskQueue;
-  std::vector<std::thread> slavePool;
-  std::mutex mutex;
-  std::condition_variable wakeupCondition;
+  bool need_shut_down_;
+  TaskQueue<std::function<void()>> task_queue_;
+  std::vector<std::thread> slave_pool_;
+  std::mutex mutex_;
+  std::condition_variable wakeup_condition_;
 
 public:
   Master(int nSlaves);
@@ -37,42 +37,42 @@ public:
   Master& operator=(const Master& another) = delete;
   Master& operator=(Master&& another) = delete;
 
-  void initSlavePool();
+  void InitSlavePool();
 
   // wait for all Slaves to join
-  void shutdown();
+  void Shutdown();
 
   template<typename F, typename... Args>
-  auto submit(F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
+  auto SubmitTask(F &&f, Args &&... args) -> std::future<decltype(f(args...))> {
     // bind given function with given parameters
-    std::function<decltype(f(args...))()> func = std::bind(std::forward<F>(f),
+    std::function<decltype(f(args...))()> task = std::bind(std::forward<F>(f),
                                                            std::forward<Args>(args)...);
 
     // encapsulate it in a shared ptr in order to be able to copy construct / assign
-    auto taskPtr = std::make_shared<std::packaged_task<decltype(f(args...))()>>(func);
+    auto task_ptr = std::make_shared<std::packaged_task<decltype(f(args...))()>>(task);
 
     // wrap packaged task into void function
-    std::function<void()> wrapperFunc = [taskPtr]() {
-      (*taskPtr)();
+    std::function<void()> wrapper_func = [task_ptr]() {
+      (*task_ptr)();
     };
 
     // put this task in queue
-    taskQueue.enqueue(wrapperFunc);
+    task_queue_.enqueue(wrapper_func);
 
     // wake up one available slave
-    wakeupCondition.notify_one();
+    wakeup_condition_.notify_one();
 
     // return future from promise
-    return taskPtr->get_future();
+    return task_ptr->get_future();
   }
 
-  bool needToShutdown() const;
+  bool NeedToShutdown() const;
 
-  TaskQueue<std::function<void()>>& getTaskQueue();
+  TaskQueue<std::function<void()>>& GetTaskQueue();
 
-  std::mutex& getMutex();
+  std::mutex& GetMutex();
 
-  std::condition_variable& getWakeupCondition();
+  std::condition_variable& GetWakeupCondition();
 };
 
 #endif //MULTITHREAD_MASTER_H
