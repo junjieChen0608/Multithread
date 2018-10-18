@@ -1,8 +1,6 @@
 #ifndef MULTITHREAD_TASKQUEUE_H
 #define MULTITHREAD_TASKQUEUE_H
 
-#pragma once
-
 #include <mutex>
 #include <queue>
 

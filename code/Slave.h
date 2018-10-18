@@ -1,8 +1,6 @@
 #ifndef MULTITHREAD_SLAVE_H
 #define MULTITHREAD_SLAVE_H
 
-#pragma once
-
 #include <functional>
 #include <future>
 #include <mutex>

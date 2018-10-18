@@ -1,8 +1,6 @@
 #ifndef MULTITHREAD_MASTER_H
 #define MULTITHREAD_MASTER_H
 
-#pragma once
-
 #include <functional>
 #include <future>
 #include <mutex>

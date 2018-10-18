@@ -74,14 +74,14 @@ void ConstRefFunction(const std::string &name, const int &age) {
 }
 
 int main() {
-  constexpr int N_THREAD = 4;
-  Master master(N_THREAD);
+  constexpr int kNumThread = 4;
+  Master master(kNumThread);
 
-  for (int i = 1; i < 3; ++i) {
-    for (int j = 1; j < 3; ++j) {
-      master.SubmitTask(Multiply, i, j);
-    }
-  }
+//  for (int i = 1; i < 10; ++i) {
+//    for (int j = 1; j < 10; ++j) {
+//      master.SubmitTask(Multiply, i, j);
+//    }
+//  }
 
   int outputRef;
   auto future1 = master.SubmitTask(MultiplyOutput, std::ref(outputRef), 1, 999);
