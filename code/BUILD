@@ -9,7 +9,7 @@ cc_library(
     srcs = [
         "master.cc",
         "slave.cc",
-        "task_queue",
+        "task_queue.cc",
     ],
     hdrs = [
         "master.h",

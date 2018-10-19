@@ -2,8 +2,8 @@
 
 #include <mutex>
 #include <queue>
-#include <functional>
 #include <memory>
+#include <functional>
 
 class TaskQueue {
  private:
@@ -15,8 +15,11 @@ class TaskQueue {
   ~TaskQueue();
 
   bool empty();
+
   size_t size();
+
   void enqueue(std::unique_ptr<std::function<void()>> task);
+
   std::unique_ptr<std::function<void()>> dequeue();
 };
 
