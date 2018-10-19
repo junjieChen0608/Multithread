@@ -17,7 +17,7 @@
 class Master {
  private:
   bool need_shut_down_;
-  TaskQueue<std::function<void()>> task_queue_;
+  TaskQueue task_queue_;
   std::vector<std::thread> slave_pool_;
   std::mutex mutex_;
   std::condition_variable wakeup_condition_;
@@ -51,9 +51,9 @@ class Master {
 
     // wrap packaged task into void function
     std::function<void()> wrapper_func = [task_ptr]() { (*task_ptr)(); };
-
+    std::unique_ptr<std::function<void()>> wrapper_func_ptr (&wrapper_func);
     // put this task in queue
-    task_queue_.enqueue(wrapper_func);
+    task_queue_.enqueue(std::move(wrapper_func_ptr));
 
     // wake up one available slave
     wakeup_condition_.notify_one();
@@ -64,7 +64,7 @@ class Master {
 
   bool NeedToShutdown() const;
 
-  TaskQueue<std::function<void()>>& GetTaskQueue();
+  TaskQueue& GetTaskQueue();
 
   std::mutex& GetMutex();
 

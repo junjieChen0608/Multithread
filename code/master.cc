@@ -35,7 +35,7 @@ bool Master::NeedToShutdown() const {
   return need_shut_down_;
 }
 
-TaskQueue<std::function<void()>>& Master::GetTaskQueue() {
+TaskQueue& Master::GetTaskQueue() {
   return task_queue_;
 }
 

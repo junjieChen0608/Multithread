@@ -6,8 +6,7 @@ Slave::Slave(Master* master, const int& id)
 Slave::~Slave() {}
 
 void Slave::operator()() {
-  std::function<void()> task;
-  bool task_allocated = false;
+  std::unique_ptr<std::function<void()>> task;
 
   while (!master_->NeedToShutdown()) {
     {
@@ -15,11 +14,11 @@ void Slave::operator()() {
       if (master_->GetTaskQueue().empty()) {
         master_->GetWakeupCondition().wait(lock);
       }
-      task_allocated = master_->GetTaskQueue().dequeue(task);
+      task = master_->GetTaskQueue().dequeue();
     }
 
-    if (task_allocated) {
-      task();
+    if (task) {
+      (*task)();
     }
   }
 }

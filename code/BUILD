@@ -1,5 +1,6 @@
 cc_library(
     name = "task_queue",
+    srcs = ["task_queue.cc"],
     hdrs = ["task_queue.h"],
 )
 
@@ -8,6 +9,7 @@ cc_library(
     srcs = [
         "master.cc",
         "slave.cc",
+        "task_queue",
     ],
     hdrs = [
         "master.h",
