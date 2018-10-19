@@ -1,30 +1,29 @@
-#ifndef MULTITHREAD_MASTER_H
-#define MULTITHREAD_MASTER_H
+#pragma once
 
 #include <functional>
 #include <future>
+#include <iostream>
 #include <mutex>
 #include <queue>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <iostream>
 
-#include "Slave.h"
-#include "TaskQueue.h"
+#include "code/slave.h"
+#include "code/task_queue.h"
 
-class Slave;
+    class Slave;
 
 class Master {
-private:
+ private:
   bool need_shut_down_;
   TaskQueue<std::function<void()>> task_queue_;
   std::vector<std::thread> slave_pool_;
   std::mutex mutex_;
   std::condition_variable wakeup_condition_;
 
-public:
-  Master(int n_slaves);
+ public:
+  explicit Master(int n_slaves);
   ~Master();
 
   // disable copy ctor
@@ -40,19 +39,18 @@ public:
   // wait for all Slaves to join
   void Shutdown();
 
-  template<typename F, typename... Args>
-  auto SubmitTask(F &&f, Args &&... args) -> std::future<decltype(f(args...))> {
+  template <typename F, typename... Args>
+  auto SubmitTask(F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
     // bind given function with given parameters
-    std::function<decltype(f(args...))()> task = std::bind(std::forward<F>(f),
-                                                           std::forward<Args>(args)...);
+    std::function<decltype(f(args...))()> task =
+        std::bind(std::forward<F>(f), std::forward<Args>(args)...);
 
-    // encapsulate it in a shared ptr in order to be able to copy construct / assign
-    auto task_ptr = std::make_shared<std::packaged_task<decltype(f(args...))()>>(task);
+    // encapsulate it in a shared ptr to copy construct and assign
+    auto task_ptr =
+        std::make_shared<std::packaged_task<decltype(f(args...))()>>(task);
 
     // wrap packaged task into void function
-    std::function<void()> wrapper_func = [task_ptr]() {
-      (*task_ptr)();
-    };
+    std::function<void()> wrapper_func = [task_ptr]() { (*task_ptr)(); };
 
     // put this task in queue
     task_queue_.enqueue(wrapper_func);
@@ -72,6 +70,3 @@ public:
 
   std::condition_variable& GetWakeupCondition();
 };
-
-#endif //MULTITHREAD_MASTER_H
-

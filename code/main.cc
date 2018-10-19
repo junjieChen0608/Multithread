@@ -11,7 +11,7 @@
  *
  * Once a Slave finished its job, it will check if there is any work to be done, if YES, do more work, ELSE Slave sleep
  *
- * Master will destroy all Slaves when it is out of scope, or user can explicitly call Shutdown() function
+ * Master will destroy all Slaves when it is output_parameter of scope, or user can explicitly call Shutdown() function
  */
 
 #include <iostream>
@@ -20,8 +20,10 @@
 #include <mutex>
 #include <condition_variable>
 #include <random>
+#include <vector>
+#include <algorithm>
 
-#include "Master.h"
+#include "code/master.h"
 
 std::random_device rd;
 std::mt19937 mt(rd());
@@ -34,21 +36,22 @@ void SimulateHardComputation() {
 }
 
 // Simple function that adds multiplies two numbers and prints the result
-void Multiply(const int a, const int b) {
+void MultiplyPrint(const int& a, const int& b) {
   SimulateHardComputation();
   const int res = a * b;
   std::cout << a << " * " << b << " = " << res << std::endl;
 }
 
 // Same as before but now we have an output parameter
-void MultiplyOutput(int &out, const int a, const int b) {
+void MultiplyOutput(const double& a, const double& b,
+                    double* output_parameter) {
   SimulateHardComputation();
-  out = a * b;
-  std::cout << a << " * " << b << " = " << out << std::endl;
+  *output_parameter = a * b;
+  std::cout << a << " * " << b << " = " << *output_parameter << std::endl;
 }
 
 // Same as before but now we have a return value
-int MultiplyReturn(const int a, const int b) {
+int MultiplyReturn(const int& a, const int& b) {
   SimulateHardComputation();
   const int res = a * b;
   std::cout << a << " * " << b << " = " << res << std::endl;
@@ -56,62 +59,62 @@ int MultiplyReturn(const int a, const int b) {
 }
 
 // modify parameter reference
-void Swap(int &a, int &b) {
+void Swap(int& a, int& b) {
   int c = a;
   a = b;
   b = c;
 }
 
 // modify parameter pointer
-void SwapPtr(int *a, int *b) {
+void SwapPtr(int* a, int* b) {
   int c = *a;
   *a = *b;
   *b = c;
-}
-
-void ConstRefFunction(const std::string &name, const int &age) {
-  std::cout << name << " is " << age << " years old\n";
 }
 
 int main() {
   constexpr int kNumThread = 4;
   Master master(kNumThread);
 
-//  for (int i = 1; i < 10; ++i) {
-//    for (int j = 1; j < 10; ++j) {
-//      master.SubmitTask(Multiply, i, j);
-//    }
-//  }
+  /********** submit tasks first **********/
+  int num_one = 90;
+  int num_two = 100;
+  master.SubmitTask(MultiplyPrint, std::cref(num_one), std::cref(num_two));
 
-  int outputRef;
-  auto future1 = master.SubmitTask(MultiplyOutput, std::ref(outputRef), 1, 999);
+  double output_parameter = 0.0;
+  double input_double_one = 11.11;
+  double input_double_two = 888.888;
+  auto future_output_ref = master.SubmitTask(MultiplyOutput,
+                                             std::cref(input_double_one),
+                                             std::cref(input_double_two),
+                                             &output_parameter);
 
-  auto future2 = master.SubmitTask(MultiplyReturn, 20, 30);
+  int input_int_one = 20;
+  int input_int_two = 30;
+  auto future_multiply_return = master.SubmitTask(MultiplyReturn,
+                                                  std::cref(input_int_one),
+                                                  std::cref(input_int_two));
+
+  /********** get results later **********/
+  future_output_ref.get();
+  std::cout << "MultiplyOutput result is " << output_parameter << "\n";
+
+  int output_return = future_multiply_return.get();
+  std::cout << "MultiplyReturn result is " << output_return << "\n";
 
   int a = 10;
   int b = 100;
-  auto future3 = master.SubmitTask(Swap, std::ref(a), std::ref(b));
+  std::cout << "before swap a " << a << ", b: " << b << "\n";
+  auto future_swap = master.SubmitTask(Swap, std::ref(a), std::ref(b));
+  future_swap.get();
+  std::cout << "after swap a: " << a << ", b: " << b << "\n";
 
   int c = 999;
   int d = 0;
-  auto future4 = master.SubmitTask(SwapPtr, &c, &d);
-
-  future1.get();
-  std::cout << "Last operation result is " << outputRef << "\n";
-
-  int res = future2.get();
-  std::cout << "Last operation result is " << res << "\n";
-
-  future3.get();
-  std::cout << "after swap a: " << a << ", b: " << b << "\n";
-
-  future4.get();
+  std::cout << "before swap c: " << c << ", d: " << d << "\n";
+  auto future_swap_ptr = master.SubmitTask(SwapPtr, &c, &d);
+  future_swap_ptr.get();
   std::cout << "after swap c: " << c << ", d: " << d << "\n";
-
-  std::string name = "John Doe";
-  int age = 99;
-  auto future5 = master.SubmitTask(ConstRefFunction, std::cref(name), std::cref(age));
-  future5.get();
 
   return 0;
 }

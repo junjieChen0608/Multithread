@@ -1,18 +1,18 @@
 cc_library(
-    name = "TaskQueue",
-    hdrs = ["TaskQueue.h"],
+    name = "task_queue",
+    hdrs = ["task_queue.h"],
 )
 
 cc_library(
-    name = "MasterAndSlave",
+    name = "master_and_slave",
     srcs = [
-        "Master.cc",
-        "Slave.cc",
+        "master.cc",
+        "slave.cc",
     ],
     hdrs = [
-        "Master.h",
-        "Slave.h",
-        "TaskQueue.h",
+        "master.h",
+        "slave.h",
+        "task_queue.h",
     ],
 )
 
@@ -21,6 +21,6 @@ cc_binary(
     srcs = ["main.cc"],
     linkopts = ["-pthread"],
     deps = [
-        ":MasterAndSlave",
+        ":master_and_slave",
     ],
 )

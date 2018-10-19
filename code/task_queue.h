@@ -1,16 +1,15 @@
-#ifndef MULTITHREAD_TASKQUEUE_H
-#define MULTITHREAD_TASKQUEUE_H
+#pragma once
 
 #include <mutex>
 #include <queue>
 
 template<typename T>
 class TaskQueue {
-private:
+ private:
   std::queue<T> internal_queue_;
   std::mutex internal_mutex_;
 
-public:
+ public:
   TaskQueue() {}
   ~TaskQueue() {}
 
@@ -29,19 +28,17 @@ public:
     internal_queue_.push(task);
   }
 
-  bool dequeue(T& outputTask) {
+  bool dequeue(T& output_task) {
     std::lock_guard<std::mutex> lock(internal_mutex_);
 
     if (internal_queue_.empty()) {
       return false;
     }
 
-    outputTask = std::move(internal_queue_.front());
+    output_task = std::move(internal_queue_.front());
     internal_queue_.pop();
 
     return true;
   }
 };
-
-#endif //MULTITHREAD_TASKQUEUE_H
 

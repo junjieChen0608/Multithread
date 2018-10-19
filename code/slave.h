@@ -1,5 +1,4 @@
-#ifndef MULTITHREAD_SLAVE_H
-#define MULTITHREAD_SLAVE_H
+#pragma once
 
 #include <functional>
 #include <future>
@@ -10,21 +9,19 @@
 #include <vector>
 #include <iostream>
 
-#include "Master.h"
-#include "TaskQueue.h"
+#include "code/master.h"
+#include "code/task_queue.h"
 
 class Master;
 
 class Slave {
-private:
+ private:
   int slave_id_;
-  Master& master_;
+  Master* master_;
 
-public:
-  Slave(Master& master, const int& id);
+ public:
+  Slave(Master* master, const int& id);
   ~Slave();
 
   void operator()();
 };
-
-#endif //MULTITHREAD_SLAVE_H
