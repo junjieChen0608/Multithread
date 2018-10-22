@@ -13,20 +13,20 @@ size_t TaskQueue::size() {
   return internal_queue_.size();
 }
 
-void TaskQueue::enqueue(std::unique_ptr<std::function<void()>> task) {
+void TaskQueue::enqueue(const std::function<void()>& task) {
   std::lock_guard<std::mutex> lock(internal_mutex_);
-  internal_queue_.push(std::move(task));
+  internal_queue_.emplace(task);
 }
 
-std::unique_ptr<std::function<void()>> TaskQueue::dequeue() {
+bool TaskQueue::dequeue(std::function<void()>& output_task) {
   std::lock_guard<std::mutex> lock(internal_mutex_);
 
   if (internal_queue_.empty()) {
-    return nullptr;
+    return false;
   }
 
-  std::unique_ptr<std::function<void()>> output_task (std::move(internal_queue_.front()));
+  output_task  = std::move(internal_queue_.front());
   internal_queue_.pop();
 
-  return output_task;
+  return true;
 }

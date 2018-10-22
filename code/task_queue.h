@@ -7,7 +7,7 @@
 
 class TaskQueue {
  private:
-  std::queue<std::unique_ptr<std::function<void()>>> internal_queue_;
+  std::queue<std::function<void()>> internal_queue_;
   std::mutex internal_mutex_;
 
  public:
@@ -18,8 +18,8 @@ class TaskQueue {
 
   size_t size();
 
-  void enqueue(std::unique_ptr<std::function<void()>> task);
+  void enqueue(const std::function<void()>& task);
 
-  std::unique_ptr<std::function<void()>> dequeue();
+  bool dequeue(std::function<void()>& output_task);
 };
 

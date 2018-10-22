@@ -12,7 +12,7 @@
 #include "code/slave.h"
 #include "code/task_queue.h"
 
-    class Slave;
+class Slave;
 
 class Master {
  private:
@@ -51,9 +51,8 @@ class Master {
 
     // wrap packaged task into void function
     std::function<void()> wrapper_func = [task_ptr]() { (*task_ptr)(); };
-    std::unique_ptr<std::function<void()>> wrapper_func_ptr (&wrapper_func);
     // put this task in queue
-    task_queue_.enqueue(std::move(wrapper_func_ptr));
+    task_queue_.enqueue(wrapper_func);
 
     // wake up one available slave
     wakeup_condition_.notify_one();

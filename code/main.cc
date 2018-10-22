@@ -77,10 +77,10 @@ int main() {
   Master master(kNumThread);
 
   /********** submit tasks first **********/
-//  int num_one = 90;
-//  int num_two = 100;
-//  auto future_multiply_print = master.SubmitTask(MultiplyPrint, std::cref(num_one), std::cref(num_two));
-//  future_multiply_print.get();
+  int num_one = 90;
+  int num_two = 100;
+  auto future_multiply_print = master.SubmitTask(MultiplyPrint, std::cref(num_one), std::cref(num_two));
+  future_multiply_print.get();
 
   double output_parameter = 0.0;
   double input_double_one = 11.11;
@@ -89,33 +89,34 @@ int main() {
                                              std::cref(input_double_one),
                                              std::cref(input_double_two),
                                              &output_parameter);
-//
-//  int input_int_one = 20;
-//  int input_int_two = 30;
-//  auto future_multiply_return = master.SubmitTask(MultiplyReturn,
-//                                                  std::cref(input_int_one),
-//                                                  std::cref(input_int_two));
+  std::cout << "task submitted\n";
+
+  int input_int_one = 20;
+  int input_int_two = 30;
+  auto future_multiply_return = master.SubmitTask(MultiplyReturn,
+                                                  std::cref(input_int_one),
+                                                  std::cref(input_int_two));
 
   /********** get results later **********/
   future_output_ref.get();
   std::cout << "MultiplyOutput result is " << output_parameter << "\n";
-//
-//  int output_return = future_multiply_return.get();
-//  std::cout << "MultiplyReturn result is " << output_return << "\n";
-//
-//  int a = 10;
-//  int b = 100;
-//  std::cout << "before swap a " << a << ", b: " << b << "\n";
-//  auto future_swap = master.SubmitTask(Swap, std::ref(a), std::ref(b));
-//  future_swap.get();
-//  std::cout << "after swap a: " << a << ", b: " << b << "\n";
-//
-//  int c = 999;
-//  int d = 0;
-//  std::cout << "before swap c: " << c << ", d: " << d << "\n";
-//  auto future_swap_ptr = master.SubmitTask(SwapPtr, &c, &d);
-//  future_swap_ptr.get();
-//  std::cout << "after swap c: " << c << ", d: " << d << "\n";
+
+  int output_return = future_multiply_return.get();
+  std::cout << "MultiplyReturn result is " << output_return << "\n";
+
+  int a = 10;
+  int b = 100;
+  std::cout << "before swap a " << a << ", b: " << b << "\n";
+  auto future_swap = master.SubmitTask(Swap, std::ref(a), std::ref(b));
+  future_swap.get();
+  std::cout << "after swap a: " << a << ", b: " << b << "\n";
+
+  int c = 999;
+  int d = 0;
+  std::cout << "before swap c: " << c << ", d: " << d << "\n";
+  auto future_swap_ptr = master.SubmitTask(SwapPtr, &c, &d);
+  future_swap_ptr.get();
+  std::cout << "after swap c: " << c << ", d: " << d << "\n";
 
   return 0;
 }
