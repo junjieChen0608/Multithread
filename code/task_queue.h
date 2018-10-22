@@ -20,6 +20,6 @@ class TaskQueue {
 
   void enqueue(const std::function<void()>& task);
 
-  bool dequeue(std::function<void()>& output_task);
+  bool dequeue(std::function<void()>* output_task);
 };
 

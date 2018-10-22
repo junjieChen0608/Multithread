@@ -18,15 +18,14 @@ void TaskQueue::enqueue(const std::function<void()>& task) {
   internal_queue_.emplace(task);
 }
 
-bool TaskQueue::dequeue(std::function<void()>& output_task) {
+bool TaskQueue::dequeue(std::function<void()>* output_task) {
   std::lock_guard<std::mutex> lock(internal_mutex_);
 
   if (internal_queue_.empty()) {
     return false;
   }
 
-  output_task  = std::move(internal_queue_.front());
+  *output_task = std::move(internal_queue_.front());
   internal_queue_.pop();
-
   return true;
 }
