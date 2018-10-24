@@ -22,6 +22,7 @@
 #include <random>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 
 #include "code/master.h"
 
@@ -72,6 +73,14 @@ void SwapPtr(int* a, int* b) {
   *b = c;
 }
 
+void ReadFile(const std::string& file_path) {
+  std::ifstream ifs(file_path);
+  std::string line;
+
+  while(getline(ifs, line)) {
+    std::cout << line << "\n";
+  }
+}
 int main() {
   constexpr int kNumThread = 4;
   Master master(kNumThread);
@@ -97,6 +106,14 @@ int main() {
                                                   std::cref(input_int_one),
                                                   std::cref(input_int_two));
 
+  std::string file_path_one =
+      "/Users/jjchen/github/Multithread/test1.txt";
+  auto future_read_one = master.SubmitTask(ReadFile, std::cref(file_path_one));
+
+  std::string file_path_two =
+      "/Users/jjchen/github/Multithread/test2.txt";
+  auto future_read_two = master.SubmitTask(ReadFile, std::cref(file_path_two));
+
   /********** get results later **********/
   future_output_ref.get();
   std::cout << "MultiplyOutput result is " << output_parameter << "\n";
@@ -117,6 +134,9 @@ int main() {
   auto future_swap_ptr = master.SubmitTask(SwapPtr, &c, &d);
   future_swap_ptr.get();
   std::cout << "after swap c: " << c << ", d: " << d << "\n";
+
+  future_read_one.get();
+  future_read_two.get();
 
   return 0;
 }
