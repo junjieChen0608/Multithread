@@ -80,7 +80,20 @@ void ReadFile(const std::string& file_path) {
   while(getline(ifs, line)) {
     std::cout << line << "\n";
   }
+
+  ifs.close();
 }
+
+void WriteFile(const std::string& file_path) {
+  std::ofstream ofs(file_path);
+
+  for (int i = 0; i < 26; ++i) {
+    ofs << static_cast<char>(97 + i) << "\n";
+  }
+
+  ofs.close();
+}
+
 int main() {
   constexpr int kNumThread = 4;
   Master master(kNumThread);
@@ -114,6 +127,10 @@ int main() {
       "/Users/jjchen/github/Multithread/test2.txt";
   auto future_read_two = master.SubmitTask(ReadFile, std::cref(file_path_two));
 
+  std::string output_path =
+      "/Users/jjchen/github/Multithread/output_test.txt";
+  auto future_write_file = master.SubmitTask(WriteFile, std::cref(output_path));
+
   /********** get results later **********/
   future_output_ref.get();
   std::cout << "MultiplyOutput result is " << output_parameter << "\n";
@@ -137,6 +154,7 @@ int main() {
 
   future_read_one.get();
   future_read_two.get();
+  future_write_file.get();
 
   return 0;
 }
