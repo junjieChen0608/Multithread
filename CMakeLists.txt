@@ -9,5 +9,13 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable(Multithread main.cc task_queue.h master.h slave.h task_queue.cc master.cc slave.cc)
+add_executable(Multithread
+               main.cc
+               task_queue.h
+               master.h
+               slave.h
+               task_queue.cc
+               master.cc
+               slave.cc)
+
 target_link_libraries(Multithread ${PCL_LIBRARIES})
