@@ -24,7 +24,12 @@
 #include <algorithm>
 #include <fstream>
 
-#include "code/master.h"
+#include <boost/filesystem.hpp>
+
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+
+#include "master.h"
 
 std::random_device rd;
 std::mt19937 mt(rd());
@@ -94,6 +99,26 @@ void WriteFile(const std::string& file_path) {
   ofs.close();
 }
 
+void LoadPointCloud(const std::string& cloud_path) {
+  boost::filesystem::path path(cloud_path);
+  boost::filesystem::directory_iterator path_it(path);
+
+  for (path_it; path_it != boost::filesystem::directory_iterator();
+       ++path_it) {
+    if (!boost::filesystem::is_directory(path_it->path())) {
+      std::string cloud_name = path_it->path().filename().string();
+      using PointT = pcl::PointXYZ;
+      using PointCloudT = pcl::PointCloud<PointT>;
+      PointCloudT::Ptr cloud(new PointCloudT());
+      if (pcl::io::loadPCDFile(cloud_path + cloud_name, *cloud) != -1) {
+        std::cout << "cloud " << cloud_name << " size " << cloud->size() << "\n";
+      } else {
+        PCL_ERROR("failed to load point cloud\n");
+      }
+    }
+  }
+}
+
 int main() {
   constexpr int kNumThread = 4;
   Master master(kNumThread);
@@ -131,6 +156,9 @@ int main() {
       "/Users/jjchen/github/Multithread/output_test.txt";
   auto future_write_file = master.SubmitTask(WriteFile, std::cref(output_path));
 
+  std::string cloud_path = "/Users/jjchen/jingchi/blender_all_config/hesai64_front/";
+  auto future_boost_pcd = master.SubmitTask(LoadPointCloud, std::cref(cloud_path));
+
   /********** get results later **********/
   future_output_ref.get();
   std::cout << "MultiplyOutput result is " << output_parameter << "\n";
@@ -155,6 +183,6 @@ int main() {
   future_read_one.get();
   future_read_two.get();
   future_write_file.get();
-
+  future_boost_pcd.get();
   return 0;
 }

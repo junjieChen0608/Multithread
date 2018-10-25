@@ -9,8 +9,8 @@
 #include <utility>
 #include <vector>
 
-#include "code/slave.h"
-#include "code/task_queue.h"
+#include "slave.h"
+#include "task_queue.h"
 
 class Slave;
 

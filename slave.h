@@ -9,8 +9,8 @@
 #include <vector>
 #include <iostream>
 
-#include "code/master.h"
-#include "code/task_queue.h"
+#include "master.h"
+#include "task_queue.h"
 
 class Master;
 

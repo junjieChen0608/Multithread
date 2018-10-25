@@ -1,4 +1,4 @@
-#include "code/master.h"
+#include "master.h"
 
 Master::Master(int n_slaves)
     : slave_pool_(std::vector<std::thread>(n_slaves)), need_shut_down_(false) {

@@ -1,4 +1,4 @@
-#include "code/slave.h"
+#include "slave.h"
 
 Slave::Slave(Master* master, const int& id)
     : master_(master), slave_id_(id) {}
